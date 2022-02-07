@@ -2,24 +2,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import getMusics from '../services/musicsAPI';
+import { addSong } from '../services/favoriteSongsAPI';
 
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import MusicCard from '../components/MusicCard';
 
 export default class Album extends Component {
-  constructor() {
-    super();
-    this.state = {
+    state = {
       musics: undefined,
       collection: undefined,
       isLoading: true,
     };
-  }
 
-  componentDidMount() {
-    this.fetchApi();
-  }
+    componentDidMount() {
+      this.fetchApi();
+    }
 
   fetchApi = async () => {
     const { match: { params: { id } } } = this.props;
@@ -29,6 +27,12 @@ export default class Album extends Component {
       collection: musics[0],
       isLoading: false,
     });
+  }
+
+  handleFavorite = async (music) => {
+    this.setState({ isLoading: true });
+    await addSong(music);
+    this.setState({ isLoading: false });
   }
 
   render() {
@@ -46,14 +50,15 @@ export default class Album extends Component {
             <div data-testid="album-name">
               <p>{collection.collectionName}</p>
             </div>
+            {musics.map((music, index) => (
+              <MusicCard
+                music={ music }
+                key={ index }
+                handleFavorite={ () => this.handleFavorite(music) }
+              />
+            ))}
           </>
         )}
-        {
-          musics
-          && (
-            musics.map((music, index) => <MusicCard music={ music } key={ index } />)
-          )
-        }
       </div>);
   }
 }
