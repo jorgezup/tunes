@@ -10,6 +10,7 @@ export default class MusicCard extends Component {
         trackId,
       },
       handleFavorite,
+      favorited,
     } = this.props;
     return (
       <div>
@@ -26,8 +27,9 @@ export default class MusicCard extends Component {
           <input
             type="checkbox"
             name="favorite"
-            onChange={ handleFavorite }
             data-testid={ `checkbox-music-${trackId}` }
+            onChange={ handleFavorite }
+            checked={ favorited }
           />
         </label>
       </div>
@@ -39,4 +41,5 @@ export default class MusicCard extends Component {
 MusicCard.propTypes = {
   music: PropTypes.element.isRequired,
   handleFavorite: PropTypes.func.isRequired,
+  favorited: PropTypes.func.isRequired,
 };
