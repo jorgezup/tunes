@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import getMusics from '../services/musicsAPI';
-import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 
 import Header from '../components/Header';
 import Loading from '../components/Loading';
@@ -32,19 +32,22 @@ export default class Album extends Component {
     });
   }
 
+    isFavorite = (trackId) => {
+      const { favoritesSongs } = this.state;
+      return favoritesSongs.find((song) => song.trackId === trackId);
+    }
+
   handleFavorite = async (music) => {
-    const { favoritesSongs } = this.state;
     this.setState({ isLoading: true });
-    await addSong(music);
+    if (this.isFavorite(music.trackId)) {
+      await removeSong(music); // There's a filter already implemented
+    } else {
+      await addSong(music); // There's spread array already implemented
+    }
     this.setState({
       isLoading: false,
-      favoritesSongs: [...favoritesSongs, music.trackId],
+      favoritesSongs: await getFavoriteSongs(),
     });
-  }
-
-  isFavorite = (trackId) => {
-    const { favoritesSongs } = this.state;
-    return favoritesSongs.find((song) => song.trackId === trackId);
   }
 
   render() {
@@ -67,7 +70,7 @@ export default class Album extends Component {
                 music={ music }
                 key={ index }
                 handleFavorite={ () => this.handleFavorite(music) }
-                favorited={ this.isFavorite(music.trackId) }
+                favorited={ !!this.isFavorite(music.trackId) } // converting the result of find in truthy or falsy
               />
             ))}
           </>
